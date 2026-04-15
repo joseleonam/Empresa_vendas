@@ -1,6 +1,5 @@
 # main.py
 import subprocess
-from app.network.TCPServidor import main as servidor_main
 from app.network.TCPCliente import main as cliente_main
 
 def menu():

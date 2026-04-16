@@ -1,7 +1,8 @@
 # TCPCliente.py
 import socket
-from app.serialization.json_service import JsonService
-
+from app.stream.mensagem_output_stream import MensagemOutputStream
+from app.stream.mensagem_input_stream import MensagemInputStream
+from app.models.mensagem import Mensagem
 
 def menu():
     print("\n=== MENU ===")
@@ -17,63 +18,39 @@ def main():
         opcao = menu()
 
         if opcao == "0":
-            print("Saindo...")
             break
 
-        # 🔹 cria conexão
         sock = socket.socket()
         sock.connect(("localhost", 5000))
 
-        # 🔹 monta request
+        # 🔥 usamos Produto como "mensagem"
         if opcao == "1":
-            request = {
-                "acao": "listar_produtos"
-            }
+            msg = Mensagem("LISTAR")
 
         elif opcao == "2":
-            id_produto = input("Digite o ID do produto: ")
-            request = {
-                "acao": "buscar_produto",
-                "id": int(id_produto)
-            }
+            ids = input("IDs (ex: 1,2,3): ")
+            lista_ids = [int(x.strip()) for x in ids.split(",")]
+            msg = Mensagem("BUSCAR", lista_ids)
 
         elif opcao == "3":
-            id_produto = input("Digite o ID do produto: ")
-            request = {
-                "acao": "comprar_produto",
-                "id": int(id_produto)
-            }
+            ids = input("IDs (ex: 1,2,3): ")
+            lista_ids = [int(x.strip()) for x in ids.split(",")]
+            msg = Mensagem("COMPRAR", lista_ids)
 
         else:
-            print("Opção inválida!")
-            sock.close()
+            print("Opção inválida")
             continue
 
-        # 🔹 envia (empacota)
-        dados = JsonService.pack(request)
-        sock.send(dados)
+        # 🔹 envia via stream
+        writer = MensagemOutputStream(msg, sock.makefile("wb"))
+        writer.write()
 
-        # 🔹 recebe resposta
-        resposta_bytes = sock.recv(4096)
-        resposta = JsonService.unpack(resposta_bytes)
+        # 🔹 recebe resposta via stream
+        reader = MensagemInputStream(sock.makefile("rb"))
+        resposta = reader.read()
 
-        # 🔹 trata resposta
-
-        if "produtos" in resposta:
-            for p in resposta["produtos"]:
-                print(f"{p.get('id','?')} - {p['nome']} - R${p['preco']}")
-
-        if "mensagem" in resposta:
-            print(resposta["mensagem"])
-
-        if "produto" in resposta:
-            p = resposta["produto"]
-            print(f"{p.get('id','?')} - {p['nome']} - R${p['preco']}")
-
-        if "erro" in resposta:
-            print("Erro:", resposta["erro"])
-
-
+        print("\n📦 Resposta do servidor:")
+        print(resposta.texto)
 
         sock.close()
 

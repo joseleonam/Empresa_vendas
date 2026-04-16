@@ -1,5 +1,6 @@
 # main.py
 import subprocess
+import sys
 from app.network.TCPCliente import main as cliente_main
 
 def menu():
@@ -12,8 +13,9 @@ def menu():
 
 def rodar_servidor():
     print("Abrindo servidor em novo terminal...")
+
     subprocess.Popen(
-        ["cmd", "/k", "python -m app.network.TCPServidor"],
+        ["cmd", "/k", f"{sys.executable} -m app.network.TCPServidor"],
         creationflags=subprocess.CREATE_NEW_CONSOLE
     )
 

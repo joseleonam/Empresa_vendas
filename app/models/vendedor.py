@@ -6,3 +6,6 @@ class Vendedor:
 
     def adicionar_produto(self, produto):
         self.produtos.append(produto)
+
+    def total_vendido(self):
+        return sum(p.preco for p in self.produtos)

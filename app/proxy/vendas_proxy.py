@@ -65,19 +65,19 @@ class VendasProxy:
             []
         )
 
-    def buscar_produto(self, produto_id):
+    def buscar_produtos(self, ids):
 
         return self._send_request(
-            "buscar_produto",
-            [produto_id]
-        )
-
-    def comprar_produtos(self, ids):
-
-        return self._send_request(
-            "comprar_produtos",
+            "buscar_produtos",
             [ids]
         )
+
+    def comprar_produtos(self, cliente, ids):
+
+        return self._send_request(
+        "comprar_produtos",
+        [cliente.__dict__, ids]
+    )
 
     def calcular_total(self, ids):
 

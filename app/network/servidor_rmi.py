@@ -5,7 +5,6 @@ import json
 
 from app.dispatcher.dispatcher import Dispatcher
 from app.service.vendas_service import VendasService
-from app.models.vendedor import Vendedor
 from app.remote.request import Request
 from app.remote.remote_object_ref import RemoteObjectRef
 
@@ -20,9 +19,7 @@ def start_server():
     dispatcher = Dispatcher()
 
     # 🔹 cria serviço remoto
-    vendas_service = VendasService(
-        Vendedor("Servidor Central")
-    )
+    vendas_service = VendasService()
 
     # 🔹 registra serviço
     dispatcher.register(

@@ -1,6 +1,16 @@
 # app/network/cliente_rmi.py
-
+import os
 from app.proxy.vendas_proxy import VendasProxy
+from app.models.cliente import Cliente
+from faker import Faker
+
+fake = Faker("pt_BR")
+
+cliente = Cliente(
+    fake.random_int(min=1, max=999),
+    fake.name(),
+    fake.email()
+)
 
 
 def menu():
@@ -15,6 +25,11 @@ def menu():
 
     return input("Escolha uma opção: ")
 
+def limpar_tela():
+
+    os.system(
+        "cls" if os.name == "nt" else "clear"
+    )
 
 def main():
 
@@ -29,20 +44,29 @@ def main():
 
             resultado = proxy.listar_produtos()
 
+            limpar_tela()
+
             print("\n=== PRODUTOS ===")
 
             print(resultado)
 
-        # 🔹 BUSCAR PRODUTO
+        # 🔹 BUSCAR PRODUTO(S)
         elif opcao == "2":
 
-            produto_id = int(
-                input("Digite o ID do produto (ex: 1): ")
+            ids = input(
+                "Digite os IDs separados por vírgula (ex: 1,2,3): "
             )
 
-            resultado = proxy.buscar_produto(
-                produto_id
+            lista_ids = [
+                int(x.strip())
+                for x in ids.split(",")
+            ]
+
+            resultado = proxy.buscar_produtos(
+                lista_ids
             )
+
+            limpar_tela()
 
             print("\n=== RESULTADO ===")
 
@@ -61,8 +85,11 @@ def main():
             ]
 
             resultado = proxy.comprar_produtos(
+                cliente,
                 lista_ids
             )
+
+            limpar_tela()
 
             print("\n=== COMPRA ===")
 
@@ -83,6 +110,8 @@ def main():
             resultado = proxy.calcular_total(
                 lista_ids
             )
+
+            limpar_tela()
 
             print("\n=== TOTAL ===")
 

@@ -1,5 +1,5 @@
+# data/load_produtos.py
 from app.models.produto import Celular, Capa, Pelicula, PowerBank
-
 
 def carregar_produtos():
     produtos = [

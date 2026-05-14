@@ -1,43 +1,72 @@
 # main.py
 import subprocess
 import sys
-from app.network.TCPCliente import main as cliente_main
+
 
 def menu():
-    print("\n=== SISTEMA DE VENDAS ===")
-    print("1 - Rodar servidor TCP")
-    print("2 - Rodar cliente TCP")
+
+    print("\n=== SISTEMA RMI DE VENDAS ===")
+
+    print("1 - Rodar servidor RMI")
+    print("2 - Rodar cliente RMI")
     print("0 - Sair")
+
     return input("Escolha uma opção: ")
 
 
 def rodar_servidor():
-    print("Abrindo servidor em novo terminal...")
+
+    print("Abrindo servidor RMI em novo terminal...")
 
     subprocess.Popen(
-        ["cmd", "/k", f"{sys.executable} -m app.network.TCPServidor"],
+        [
+            "cmd",
+            "/k",
+            f"{sys.executable} -m app.network.servidor_rmi"
+        ],
         creationflags=subprocess.CREATE_NEW_CONSOLE
     )
 
+
 def rodar_cliente():
-    print("Iniciando cliente TCP...")
-    cliente_main()
+
+    print("Abrindo cliente RMI em novo terminal...")
+
+    subprocess.Popen(
+        [
+            "cmd",
+            "/k",
+            f"{sys.executable} -m app.network.cliente_rmi"
+        ],
+        creationflags=subprocess.CREATE_NEW_CONSOLE
+    )
+
 
 def main():
+
     while True:
+
         opcao = menu()
-        
+
+        # 🔹 SERVIDOR
         if opcao == "1":
+
             rodar_servidor()
 
+        # 🔹 CLIENTE
         elif opcao == "2":
+
             rodar_cliente()
 
+        # 🔹 SAIR
         elif opcao == "0":
+
             print("Encerrando sistema...")
+
             break
 
         else:
+
             print("Opção inválida!")
 
 

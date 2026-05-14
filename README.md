@@ -88,7 +88,7 @@ Empresa_vendas/
 ├── requirements.txt
 │
 └── README.md
-
+```
 ## 🚀 Como Executar
 
 ### 1. Criar ambiente virtual

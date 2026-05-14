@@ -15,7 +15,7 @@ git push origin main --force
 apaga codigo local e atualiza com o git
 ```bash
 git fetch origin
-git reset --hard origin/main
+git reset --hard origin/<nome da branch>
 ```
 # Empresa Vendas - Sistema Distribuído com RMI
 

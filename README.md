@@ -1,3 +1,19 @@
+# usar esse comando do commit pra saber quem e quando foi feita a alteração
+```bash
+git branch
+git status
+git add .
+git commit -m "Jose leonam $(Get-Date)"
+```
+```bash
+git push
+```
+
+# apaga codigo local e atualiza com o git
+```bash
+git fetch origin
+git reset --hard origin/main
+```
 # Empresa Vendas - Sistema Distribuído com RMI
 
 Projeto desenvolvido para a disciplina de Sistemas Distribuídos utilizando Python.

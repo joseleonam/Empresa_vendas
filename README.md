@@ -8,8 +8,11 @@ git commit -m "Jose leonam $(Get-Date)"
 ```bash
 git push
 ```
-
-# apaga codigo local e atualiza com o git
+ignora erro de commits do github
+```bash
+git push origin main --force
+```
+apaga codigo local e atualiza com o git
 ```bash
 git fetch origin
 git reset --hard origin/main

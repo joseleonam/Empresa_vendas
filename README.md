@@ -1,31 +1,39 @@
+
 # usar esse comando do commit pra saber quem e quando foi feita a alteração
+
 ```bash
 git branch
 git status
 git add .
 git commit -m "Jose leonam $(Get-Date)"
 ```
+
 ```bash
 git push
 ```
+
 ignora erro de commits do github
+
 ```bash
 git push origin main --force
 ```
+
 apaga codigo local e atualiza com o git
+
 ```bash
 git fetch origin
 git reset --hard origin/<nome da branch>
 ```
+
 ---
 
-# Sistema Distribuído de Vendas — XML-RPC
+## Sistema Distribuído de Vendas — XML-RPC
 
 utilizando o conceito de Remote Method Invocation (RMI) em Python através de XML-RPC.
 
 ---
 
-# Objetivo do Projeto
+## Objetivo do Projeto
 
 O objetivo deste trabalho é implementar uma aplicação distribuída utilizando o paradigma de Invocação Remota de Métodos (RMI).
 
@@ -33,7 +41,7 @@ O sistema permite que clientes realizem operações remotamente em um servidor d
 
 ---
 
-# Descrição do Projeto
+## Descrição do Projeto
 
 O projeto implementa um sistema distribuído de vendas baseado na arquitetura cliente-servidor utilizando XML-RPC.
 
@@ -48,7 +56,7 @@ O cliente realiza chamadas remotas diretamente para o servidor utilizando o prot
 
 ---
 
-# Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 Empresa_vendas/
@@ -81,9 +89,9 @@ Empresa_vendas/
 
 ---
 
-# Conceitos de Sistemas Distribuídos Utilizados
+## Conceitos de Sistemas Distribuídos Utilizados
 
-## Comunicação Cliente-Servidor
+### Comunicação Cliente-Servidor
 
 O sistema utiliza arquitetura cliente-servidor, onde:
 
@@ -93,7 +101,7 @@ O sistema utiliza arquitetura cliente-servidor, onde:
 
 ---
 
-# Arquitetura RMI Implementada
+## Arquitetura RMI Implementada
 
 O projeto utiliza XML-RPC para implementar chamadas remotas de métodos em Python.
 
@@ -113,7 +121,7 @@ O XML-RPC é responsável por:
 
 ---
 
-# Representação Externa de Dados
+## Representação Externa de Dados
 
 O sistema utiliza serialização automática do XML-RPC para envio de dados entre cliente e servidor.
 
@@ -137,7 +145,7 @@ Cliente(
 
 ---
 
-# Entidades do Sistema
+## Entidades do Sistema
 
 O sistema possui as seguintes entidades:
 
@@ -148,7 +156,7 @@ O sistema possui as seguintes entidades:
 
 ---
 
-# Herança ("é-um")
+## Herança ("é-um")
 
 O projeto implementa herança através das subclasses de Produto:
 
@@ -165,7 +173,7 @@ Produto
 
 ---
 
-# Agregação ("tem-um")
+## Agregação ("tem-um")
 
 O projeto implementa agregação através da classe Pedido:
 
@@ -175,10 +183,10 @@ O projeto implementa agregação através da classe Pedido:
 
 ---
 
-# Métodos Remotos Implementados
+## Métodos Remotos Implementados
 
 | Método | Descrição |
-|---|---|
+| --- | --- |
 | listar_produtos() | Lista todos os produtos |
 | buscar_produtos(ids) | Busca produtos por ID |
 | comprar_produtos(cliente, ids) | Realiza compra |
@@ -186,7 +194,7 @@ O projeto implementa agregação através da classe Pedido:
 
 ---
 
-# Passagem por Valor
+## Passagem por Valor
 
 A passagem por valor é utilizada para envio de objetos locais entre cliente e servidor.
 
@@ -208,10 +216,10 @@ Cliente(
 
 ---
 
-# Requisitos Atendidos
+## Requisitos Atendidos
 
 | Requisito | Status |
-|---|---|
+| --- | --- |
 | Comunicação cliente-servidor | ✅ |
 | RMI/RPC | ✅ |
 | 4 entidades | ✅ |
@@ -224,7 +232,7 @@ Cliente(
 
 ---
 
-# Observação Importante
+## Observação Importante
 
 Python não possui uma implementação nativa equivalente ao Java RMI.
 

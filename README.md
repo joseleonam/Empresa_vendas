@@ -17,9 +17,11 @@ apaga codigo local e atualiza com o git
 git fetch origin
 git reset --hard origin/<nome da branch>
 ```
-# Sistema Distribuído de Vendas — RMI em Python
+---
 
-Implementação de um sistema de vendas distribuído utilizando o conceito de Remote Method Invocation (RMI) em Python, seguindo o modelo Request-Response.
+# Sistema Distribuído de Vendas — XML-RPC
+
+utilizando o conceito de Remote Method Invocation (RMI) em Python através de XML-RPC.
 
 ---
 
@@ -31,17 +33,9 @@ O sistema permite que clientes realizem operações remotamente em um servidor d
 
 ---
 
-
-
-# Sistema RMI de Vendas
-
-Projeto desenvolvido para a disciplina de Sistemas Distribuídos da Universidade Federal do Ceará (UFC - Campus Quixadá), utilizando o conceito de Remote Method Invocation (RMI) em Python.
-
----
-
 # Descrição do Projeto
 
-O projeto implementa um sistema distribuído de vendas baseado no modelo cliente-servidor utilizando o padrão Request-Response inspirado em RMI (Remote Method Invocation).
+O projeto implementa um sistema distribuído de vendas baseado na arquitetura cliente-servidor utilizando XML-RPC.
 
 O sistema possui os seguintes métodos remotos:
 
@@ -50,15 +44,7 @@ O sistema possui os seguintes métodos remotos:
 3. Comprar produtos
 4. Calcular total da compra
 
-A comunicação entre cliente e servidor é feita através de chamadas remotas simuladas utilizando:
-
-- Proxy
-- Dispatcher
-- Request
-- Response
-- RemoteObjectRef
-
-As mensagens são serializadas utilizando JSON.
+O cliente realiza chamadas remotas diretamente para o servidor utilizando o protocolo XML-RPC do Python.
 
 ---
 
@@ -69,9 +55,6 @@ Empresa_vendas/
 │
 ├── app/
 │
-│ ├── dispatcher/
-│ │ └── dispatcher.py
-│ │
 │ ├── models/
 │ │ ├── cliente.py
 │ │ ├── pedido.py
@@ -81,17 +64,6 @@ Empresa_vendas/
 │ ├── network/
 │ │ ├── cliente_rmi.py
 │ │ └── servidor_rmi.py
-│ │
-│ ├── proxy/
-│ │ └── vendas_proxy.py
-│ │
-│ ├── remote/
-│ │ ├── remote_object_ref.py
-│ │ ├── request.py
-│ │ └── response.py
-│ │
-│ ├── serialization/
-│ │ └── json_serializer.py
 │ │
 │ └── service/
 │ ├── vendas.py
@@ -123,101 +95,45 @@ O sistema utiliza arquitetura cliente-servidor, onde:
 
 # Arquitetura RMI Implementada
 
-O projeto implementa uma simulação de RMI em Python utilizando os seguintes componentes:
+O projeto utiliza XML-RPC para implementar chamadas remotas de métodos em Python.
 
-## Proxy
-
-Arquivo:
+A comunicação ocorre da seguinte forma:
 
 ```text
-app/proxy/vendas_proxy.py
+Cliente → Chamada Remota → Servidor → Método → Resposta → Cliente
 ```
 
-Responsável por:
+O XML-RPC é responsável por:
 
-- representar o objeto remoto no cliente
-- empacotar requisições
-- enviar chamadas remotas
-- receber respostas
-
----
-
-## Dispatcher
-
-Arquivo:
-
-```text
-app/dispatcher/dispatcher.py
-```
-
-Responsável por:
-
-- localizar o objeto remoto
-- identificar o método solicitado
-- executar o método remotamente
-- retornar o resultado
-
----
-
-## Request
-
-Arquivo:
-
-```text
-app/remote/request.py
-```
-
-Representa a mensagem de requisição contendo:
-
-- referência do objeto remoto
-- nome do método
-- argumentos
-
----
-
-## Response
-
-Arquivo:
-
-```text
-app/remote/response.py
-```
-
-Representa a resposta enviada pelo servidor contendo:
-
-- status da execução
-- resultado do método remoto
-
----
-
-## RemoteObjectRef
-
-Arquivo:
-
-```text
-app/remote/remote_object_ref.py
-```
-
-Representa a referência remota do objeto disponibilizado pelo servidor.
+- comunicação remota
+- serialização de dados
+- envio de requisições
+- envio de respostas
+- execução remota de métodos
 
 ---
 
 # Representação Externa de Dados
 
-O projeto utiliza JSON para serialização e desserialização de mensagens remotas.
+O sistema utiliza serialização automática do XML-RPC para envio de dados entre cliente e servidor.
+
+Além disso, objetos locais são enviados por valor utilizando dicionários Python.
 
 Exemplo:
 
 ```python
-json.dumps()
-json.loads()
+cliente.__dict__
 ```
 
-A serialização é utilizada para:
+O servidor reconstrói o objeto:
 
-- empacotar requests
-- empacotar responses
-- realizar passagem por valor
+```python
+Cliente(
+    cliente_data["id"],
+    cliente_data["nome"],
+    cliente_data["email"]
+)
+```
 
 ---
 
@@ -261,8 +177,6 @@ O projeto implementa agregação através da classe Pedido:
 
 # Métodos Remotos Implementados
 
-O sistema possui os seguintes métodos remotos:
-
 | Método | Descrição |
 |---|---|
 | listar_produtos() | Lista todos os produtos |
@@ -272,27 +186,9 @@ O sistema possui os seguintes métodos remotos:
 
 ---
 
-# Passagem por Referência
-
-A passagem por referência é simulada através da classe:
-
-```python
-RemoteObjectRef
-```
-
-Ela identifica o objeto remoto disponibilizado pelo servidor.
-
-Exemplo:
-
-```python
-RemoteObjectRef("VendasService")
-```
-
----
-
 # Passagem por Valor
 
-A passagem por valor é utilizada para envio de objetos locais.
+A passagem por valor é utilizada para envio de objetos locais entre cliente e servidor.
 
 Exemplo:
 
@@ -300,7 +196,7 @@ Exemplo:
 cliente.__dict__
 ```
 
-O servidor reconstrói o objeto:
+O servidor reconstrói o objeto recebido:
 
 ```python
 Cliente(
@@ -317,14 +213,14 @@ Cliente(
 | Requisito | Status |
 |---|---|
 | Comunicação cliente-servidor | ✅ |
-| Arquitetura Request-Response | ✅ |
+| RMI/RPC | ✅ |
 | 4 entidades | ✅ |
 | 2 agregações | ✅ |
 | 2 heranças | ✅ |
 | 4 métodos remotos | ✅ |
-| Passagem por referência | ✅ |
 | Passagem por valor | ✅ |
-| Serialização JSON | ✅ |
+| XML-RPC | ✅ |
+| Sem sockets manuais | ✅ |
 
 ---
 
@@ -332,14 +228,7 @@ Cliente(
 
 Python não possui uma implementação nativa equivalente ao Java RMI.
 
-Por isso, o projeto implementa uma simulação de RMI utilizando:
-
-- Proxy
-- Dispatcher
-- Request/Response
-- RemoteObjectRef
-
-seguindo os conceitos apresentados na disciplina.
+Por isso, o projeto utiliza XML-RPC, que implementa o conceito de Remote Procedure Call (RPC), permitindo chamadas remotas de métodos entre cliente e servidor sem utilização manual de sockets.
 
 ---
 

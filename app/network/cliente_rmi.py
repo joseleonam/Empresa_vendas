@@ -1,8 +1,13 @@
 # app/network/cliente_rmi.py
 import os
-from app.proxy.vendas_proxy import VendasProxy
 from app.models.cliente import Cliente
 from faker import Faker
+import xmlrpc.client
+
+proxy = xmlrpc.client.ServerProxy(
+    "http://localhost:6000/",
+    allow_none=True
+)
 
 fake = Faker("pt_BR")
 
@@ -32,8 +37,6 @@ def limpar_tela():
     )
 
 def main():
-
-    proxy = VendasProxy()
 
     while True:
 

@@ -1,94 +1,37 @@
-# app/network/servidor_rmi.py
+from xmlrpc.server import SimpleXMLRPCServer
 
-import socket
-import json
-
-from app.dispatcher.dispatcher import Dispatcher
 from app.service.vendas_service import VendasService
-from app.remote.request import Request
-from app.remote.remote_object_ref import RemoteObjectRef
-
 
 HOST = "localhost"
 PORT = 6000
 
+server = SimpleXMLRPCServer(
+    (HOST, PORT),
+    allow_none=True
+)
 
-def start_server():
+service = VendasService()
 
-    # 🔹 cria dispatcher
-    dispatcher = Dispatcher()
+server.register_function(
+    service.listar_produtos,
+    "listar_produtos"
+)
 
-    # 🔹 cria serviço remoto
-    vendas_service = VendasService()
+server.register_function(
+    service.buscar_produtos,
+    "buscar_produtos"
+)
 
-    # 🔹 registra serviço
-    dispatcher.register(
-        "VendasService",
-        vendas_service
-    )
+server.register_function(
+    service.comprar_produtos,
+    "comprar_produtos"
+)
 
-    # 🔹 cria socket servidor
-    server = socket.socket(
-        socket.AF_INET,
-        socket.SOCK_STREAM
-    )
+server.register_function(
+    service.calcular_total,
+    "calcular_total"
+)
 
-    server.bind((HOST, PORT))
+print(f"Servidor RMI rodando em {HOST}:{PORT}")
 
-    server.listen(5)
-
-    print(f"[SERVIDOR RMI] Rodando em {HOST}:{PORT}")
-
-    while True:
-
-        conn, addr = server.accept()
-
-        print(f"\nCliente conectado: {addr}")
-
-        try:
-
-            # 🔹 recebe request serializada
-            data = conn.recv(4096).decode()
-
-            request_data = json.loads(data)
-
-            # 🔹 reconstruindo request
-            request = Request(
-                RemoteObjectRef(
-                    request_data["object_name"]
-                ),
-                request_data["method_name"],
-                request_data["args"]
-            )
-
-            # 🔹 dispatcher executa
-            response = dispatcher.dispatch(request)
-
-            # 🔹 serializa response
-            response_data = {
-                "status": response.status,
-                "result": response.result
-            }
-
-            conn.send(
-                json.dumps(response_data).encode()
-            )
-
-        except Exception as e:
-
-            erro = {
-                "status": "erro",
-                "result": str(e)
-            }
-
-            conn.send(
-                json.dumps(erro).encode()
-            )
-
-        finally:
-
-            conn.close()
-
-
-if __name__ == "__main__":
-    start_server()
+server.serve_forever()

@@ -1,4 +1,30 @@
-.venv/
+# Ambientes virtuais
 venv/
+.venv/
+ENV/
+env/
+SERVIDOR/
+CLIENTE/
+
+# Python
 __pycache__/
-*.egg-info/
+*.pyc
+*.pyo
+*.pyd
+
+# Banco SQLite
+*.db
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

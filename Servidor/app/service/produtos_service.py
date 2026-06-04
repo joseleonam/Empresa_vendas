@@ -1,37 +1,48 @@
-# Servidor/app/service/produtos_service.py
+# SERVIDOR/app/service/produtos_service.py
 from app.service.vendas import Vendas
 from data.load_produtos import carregar_produtos
+from app.tuplespace.global_space import space
 
-from faker import Faker
-fake = Faker("pt_BR")
 
 class ProdutosService(Vendas):
+
     def __init__(self):
+
         self.produtos = carregar_produtos()
 
-    # 🔹 LISTAR PRODUTOS
+        if not space.read("PRODUTO"):
+
+            for produto in self.produtos:
+                space.write(
+                    (
+                        "PRODUTO",
+                        produto.id,
+                        produto.nome,
+                        produto.preco
+                    )
+                )
+
     def listar_produtos(self):
 
+        produtos = [
+            t for t in space.listar_tuplas()
+            if t[0] == "PRODUTO"
+        ]
+
         return "\n".join(
-            f"{p.id} - {p.nome} - R${p.preco:.2f}"
-            for p in self.produtos
+            f"{id} - {nome} - R${preco:.2f}"
+            for _, id, nome, preco in produtos
         )
 
-    # 🔹 BUSCAR PRODUTO(S)
     def buscar_produtos(self, ids):
 
-        ids = [int(i) for i in ids]  # 🔥 GARANTE TIPO CORRETO
-
         encontrados = [
-            p for p in self.produtos
-            if int(p.id) in ids
+            t for t in space.listar_tuplas()
+            if t[0] == "PRODUTO"
+            and t[1] in ids
         ]
 
-        if not encontrados:
-
-            return []
-
-        return [
-            f"{p.id} - {p.nome} - R${p.preco:.2f}"
-            for p in encontrados
-        ]
+        return "\n".join(
+            f"{id} - {nome} - R${preco:.2f}"
+            for _, id, nome, preco in encontrados
+        )

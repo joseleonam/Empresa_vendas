@@ -1,4 +1,4 @@
-# app/models/vendedor.py
+# SERVIDOR/app/models/vendedor.py
 class Vendedor:
     def __init__(self, nome):
         self.nome = nome

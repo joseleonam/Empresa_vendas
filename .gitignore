@@ -1,0 +1,17 @@
+# Ambientes virtuais
+Servidor/SERVIDOR/
+Cliente/CLIENTE/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Banco SQLite
+*.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log

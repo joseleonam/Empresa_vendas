@@ -1,4 +1,4 @@
-# app/models/produto.py
+# SERVIDOR/app/models/produto.py
 class Produto:
     def __init__(self, id, nome, preco):
         self.id = id

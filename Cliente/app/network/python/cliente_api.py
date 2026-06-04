@@ -1,4 +1,4 @@
-# Cliente/app/network/python/cliente_api.py
+# CLIENTE/app/network/python/cliente_api.py
 
 import requests
 from app.models.cliente import Cliente
@@ -26,11 +26,7 @@ def listar_produtos():
 def buscar_produtos(ids: list[int]):
     ids_str = ",".join(map(str, ids))
 
-    response = requests.get(
-        f"{BASE_URL}/produtos/buscar",
-        params={"ids": ids_str}
-    )
-
+    response = requests.get(f"{BASE_URL}/produtos/buscar", params={"ids": ids_str})
     return response.json()
 
 
@@ -40,22 +36,17 @@ def comprar_produtos(cliente: dict, ids: list[int]):
         "ids": ids
     }
 
-    response = requests.post(
-        f"{BASE_URL}/compras",
-        json=payload
-    )
-
+    response = requests.post(f"{BASE_URL}/compras", json=payload)
     return response.json()
 
 
 def calcular_total(ids: list[int]):
-    payload = {
-        "ids": ids
-    }
+    payload = {"ids": ids}
 
-    response = requests.post(
-        f"{BASE_URL}/total",
-        json=payload
-    )
-
+    response = requests.post(f"{BASE_URL}/total", json=payload)
     return response.json()
+
+def buscar_pedido(cliente_id):
+    response = requests.get(f"{BASE_URL}/pedidos/{cliente_id}")
+    return response.json()
+

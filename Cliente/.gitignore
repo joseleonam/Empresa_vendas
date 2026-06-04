@@ -1,4 +1,3 @@
-.venv/
-venv/
+CLIENTE/
 __pycache__/
 *.egg-info/

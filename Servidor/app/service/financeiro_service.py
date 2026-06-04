@@ -1,24 +1,21 @@
-# Servidor/app/service/financeiro_service.py
+# SERVIDOR/app/service/financeiro_service.py
 from app.service.vendas import Vendas
-from data.load_produtos import carregar_produtos
+from app.tuplespace.global_space import space
 
-from faker import Faker
-fake = Faker("pt_BR")
 
 class FinanceiroService(Vendas):
-    def __init__(self):
-        self.produtos = carregar_produtos()
 
-    # 🔹 CALCULAR TOTAL
     def calcular_total(self, ids):
-        encontrados = [
-            p for p in self.produtos
-            if p.id in ids
+
+        produtos = [
+            t for t in space.listar_tuplas()
+            if t[0] == "PRODUTO"
+            and t[1] in ids
         ]
+        nomes = ", ".join(p[2] for p in produtos)
+        total = sum(p[3] for p in produtos)
 
-        total = sum(
-            p.preco
-            for p in encontrados
+        return (
+            f"Produtos: {nomes}\n"
+            f"Total: R${total:.2f}"
         )
-
-        return f"Total: R${total:.2f}"

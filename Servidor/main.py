@@ -1,43 +1,82 @@
-# Servidor/main.py
-from fastapi import FastAPI
-from app.service.produtos_service import ProdutosService
-from app.service.compras_service import ComprasService
-from app.service.financeiro_service import FinanceiroService
-app = FastAPI(
-    title="Sistema de Vendas API",
-    version="1.0"
-)
-
-produtos_service = ProdutosService()
-compras_service = ComprasService()
-financeiro_service = FinanceiroService()
+# SERVIDOR/main.py
+import os
+import subprocess
+import sys
 
 
-@app.get("/produtos")
-def listar_produtos():
-    return produtos_service.listar_produtos()
+def menu():
+
+    print("\n=== SISTEMA RMI DE VENDAS ===")
+
+    print("1 - Rodar FastAPI")
+    print("2 - Rodar Worker")
+    print("0 - Sair")
+
+    return input("Escolha uma opção: ")
 
 
-@app.get("/produtos/buscar")
-def buscar_produtos(ids: str | None = None):
-    if not ids:
-        return []
+def rodar_fastapi():
 
-    lista_ids = [int(i) for i in ids.split(",")]
-    return produtos_service.buscar_produtos(lista_ids)
+    print("Abrindo FastAPI em novo terminal...")
 
-@app.post("/compras")
-def comprar_produtos(dados: dict):
-    return compras_service.comprar_produtos(
-        dados["cliente"],
-        dados["ids"]
+    subprocess.Popen(
+        [
+            "cmd",
+            "/k",
+            f"{sys.executable} -m FastAPI"
+        ],
+        creationflags=subprocess.CREATE_NEW_CONSOLE
     )
 
 
-@app.post("/total")
-def calcular_total(dados: dict):
-    return financeiro_service.calcular_total(dados["ids"])
+def rodar_worker():
+
+    print("Abrindo Worker em novo terminal...")
+
+    subprocess.Popen(
+        [
+            "cmd",
+            "/k",
+            f"{sys.executable} -m worker"
+        ],
+        creationflags=subprocess.CREATE_NEW_CONSOLE
+    )
+
+def limpar_tela():
+
+    os.system(
+        "cls" if os.name == "nt" else "clear"
+    )
+
+def main():
+
+    limpar_tela()
+
+    while True:
+
+        opcao = menu()
+
+        # 🔹 FastAPI
+        if opcao == "1":
+
+            rodar_fastapi()
+
+        # 🔹 Worker
+        elif opcao == "2":
+
+            rodar_worker()
+
+        # 🔹 SAIR
+        elif opcao == "0":
+
+            print("Encerrando sistema...")
+
+            break
+
+        else:
+
+            print("Opção inválida!")
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    main()

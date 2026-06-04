@@ -1,4 +1,4 @@
-# app/models/cliente.py
+# SERVIDOR/app/models/cliente.py
 class Cliente:
 
     def __init__(self, id, nome, email):

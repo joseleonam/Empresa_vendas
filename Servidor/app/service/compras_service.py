@@ -1,52 +1,46 @@
 # Servidor/app/service/compras_service.py
+
 from app.service.vendas import Vendas
-from data.load_produtos import carregar_produtos
+from app.tuplespace.global_space import space
 
-from app.models.vendedor import Vendedor
-from app.models.cliente import Cliente
-from app.models.pedido import Pedido
-
-from faker import Faker
-fake = Faker("pt_BR")
 
 class ComprasService(Vendas):
-    def __init__(self):
-        self.produtos = carregar_produtos()
 
-    # 🔹 COMPRAR PRODUTOS
-    def comprar_produtos(self, cliente_data,ids):
-        encontrados = [
-            p for p in self.produtos
-            if p.id in ids
-        ]
+    def comprar_produtos(
+        self,
+        cliente,
+        ids
+    ):
 
-        if not encontrados:
-            return "Nenhum produto encontrado"
-        
-        # 🔹 reconstrói cliente recebido
-        cliente = Cliente(
-            cliente_data["id"],
-            cliente_data["nome"],
-            cliente_data["email"]
+        space.write(
+            (
+                "COMPRA",
+                cliente,
+                ids
+            )
         )
 
-        # 🔹 vendedor criado automaticamente
-        vendedor = Vendedor(
-            fake.name()
-        )
+        return {
+            "status":
+            "Compra enviada para o espaço de tuplas"
+        }
+    
+    def buscar_pedido(self, cliente_id: int):
         
-        # 🔹 adiciona produtos ao vendedor
-        for produto in encontrados:
-            vendedor.adicionar_produto(
-                produto
+        pedidos = []
+        while True:
+            pedido = space.take_pedido_cliente(
+                cliente_id
             )
 
-        # 🔹 cria pedido
-        pedido = Pedido(
-            fake.random_int(min=1, max=999),
-            cliente,
-            vendedor,
-            encontrados
-        )
+            if pedido:
+                pedidos.append(pedido["resumo"])
+            else:
+                break
 
-        return pedido.resumo()
+        if pedidos:
+            return pedidos
+
+        return {
+            "status": "Nenhum pedido encontrado"
+        }

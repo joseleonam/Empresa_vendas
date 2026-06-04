@@ -1,4 +1,4 @@
-# vendas.py
+# Servidor/app/service/vendas.py
 class Vendas:
     def vender(self, produto):
         raise NotImplementedError

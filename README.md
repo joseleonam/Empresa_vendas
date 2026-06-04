@@ -134,22 +134,22 @@ Mesmo que o Worker esteja desligado, as compras continuam disponíveis para proc
 
 ## Execução
 
+execute criente e servidor em diretorios separados
+
+cliente -> Empresa_vendas/Cliente/
+
+servidor -> Empresa_vendas/Servidor/
+
 ### 1. Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Executar o FastAPI
+### 2. Executar o FastAPI e Worker
 
 ```bash
-python FastAPI.py
-```
-
-### 3. Executar o Worker
-
-```bash
-python worker.py
+python main.py
 ```
 
 ### 4. Executar o Cliente
@@ -157,23 +157,3 @@ python worker.py
 ```bash
 python main.py
 ```
-
-## Estrutura do Projeto
-
-```text
-Empresa_vendas
-│
-├── Cliente
-│
-├── Servidor
-│   ├── FastAPI.py
-│   ├── worker.py
-│   ├── app
-│   └── data
-│
-└── README.md
-```
-
-## Autores
-
-Trabalho desenvolvido para a disciplina de Sistemas Distribuídos da UFC - Campus Quixadá.

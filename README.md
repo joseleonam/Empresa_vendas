@@ -1,127 +1,163 @@
-# Sistema Distribuído de Vendas com Tuple Space
 
-## Disciplina
+# 📌 Trabalho 4 – Comunicação Indireta
 
-Sistemas Distribuídos (QXD0043)
+**Sistema de Vendas com Tuple Space (SQLite + FastAPI)**
+Disciplina: Sistemas Distribuídos – QXD0043
+Universidade Federal do Ceará – Campus Quixadá
 
-Universidade Federal do Ceará - Campus de Quixadá
+---
 
-Professor: Rafael Braga
+## 🧠 1. Visão Geral
 
-## Descrição
+Este projeto evolui uma arquitetura de sistema distribuído previamente baseada em comunicação direta para uma arquitetura com **comunicação indireta**, utilizando o paradigma de **Espaço de Tuplas (Tuple Space)** como intermediário.
 
-Este projeto implementa um Sistema Distribuído de Vendas utilizando a abordagem de Comunicação Indireta baseada em Espaço de Tuplas (Tuple Space).
+A solução foi implementada com **FastAPI** para expor serviços HTTP e um **TupleSpace persistente em SQLite** para desacoplamento entre componentes.
 
-O objetivo é desacoplar os componentes do sistema por meio de uma memória compartilhada persistente, permitindo que produtores e consumidores troquem informações sem comunicação direta.
+---
 
-## Arquitetura
+## 🏗️ 2. Arquitetura do Sistema
 
-O sistema é composto por três componentes principais:
+## 📊 Visão Lado a Lado (Cliente vs Servidor)
 
-### Cliente
+```text
+CLIENTE                                  SERVIDOR
+---------------------------------------------------------------
 
-Responsável por:
-
-* Listar produtos
-* Buscar produtos
-* Solicitar compras
-* Calcular totais
-* Consultar pedidos processados
-
-A comunicação ocorre através da API REST.
-
-### Servidor FastAPI
-
-Responsável por:
-
-* Receber requisições dos clientes
-* Inserir tuplas no espaço de tuplas
-* Consultar informações persistidas
-
-### Worker
-
-Responsável por:
-
-* Consumir tuplas do tipo COMPRA
-* Processar pedidos
-* Gerar tuplas do tipo PEDIDO
-
-## Espaço de Tuplas
-
-Foi implementado um Tuple Space persistente utilizando SQLite.
-
-Operações disponíveis:
-
-* write() → insere tuplas
-* read() → consulta tuplas
-* take() → remove e retorna tuplas
-* listar_tuplas() → exibe todas as tuplas
-
-Exemplos:
-
-### Produto
-
-```python
-("PRODUTO", 1, "iPhone 14", 5000)
+┌───────────────┐                       ┌─────────────────────┐
+│ CLI Interface │                       │ FastAPI Server      │
+└──────┬────────┘                       └─────────┬───────────┘
+       │                                         │
+       v                                         v
+┌───────────────┐                       ┌─────────────────────┐
+│ cliente_api.py│   HTTP Requests       │ ProdutosService     │
+│ (requests)    │ ────────────────────> │ ComprasService      │
+└──────┬────────┘                       │ FinanceiroService   │
+       │                                └─────────┬───────────┘
+       v                                          │
+┌───────────────┐                                 │
+│ Cliente Fake  │                                 │
+└───────────────┘                                 v
+                                        ┌─────────────────────┐
+                                        │ TupleSpace (SQLite) │
+                                        │ INTERMEDIÁRIO       │
+                                        └─────────┬───────────┘
+                                                  │
+                                                  v
+                                        ┌─────────────────────┐
+                                        │ Worker (loop)       │
+                                        │ Processa COMPRA     │
+                                        └─────────────────────┘
 ```
 
-### Compra
+---
 
-```python
-(
-    "COMPRA",
-    {
-        "id": 123,
-        "nome": "João Silva",
-        "email": "joao@email.com"
-    },
-    [1, 2]
-)
+## 🏗️ 3. Estrutura Interna (Separada)
+
+### 👤 CLIENTE
+
+```text
+CLIENTE
+┌────────────────────────────┐
+│ main.py (menu CLI)         │
+└────────────┬───────────────┘
+             │
+             v
+┌────────────────────────────┐
+│ cliente_api.py             │
+│ - requests HTTP            │
+└────────────┬───────────────┘
+             │
+             v
+┌────────────────────────────┐
+│ Geração de Cliente Fake    │
+│ (Faker)                    │
+└────────────────────────────┘
 ```
 
-### Pedido
+---
 
-```python
-(
-    "PEDIDO",
-    {
-        "Pedido_id": 10,
-        "cliente_id": 123,
-        "cliente_nome": "João Silva",
-        "vendedor": "Maria Souza",
-        "produtos": ["iPhone 14", "Galaxy S23"],
-        "total": 8500
-    }
-)
+### 🖥️ SERVIDOR
+
+```text
+SERVIDOR
+        ┌────────────────────────────┐
+        │ FastAPI                    │
+        └────────────┬───────────────┘
+                     │
+     ┌───────────────┼────────────────┐
+     v               v                v
+┌──────────┐ ┌──────────────┐ ┌────────────────┐
+│ Produtos │ │ Compras      │ │ Financeiro     │
+│ Service  │ │ Service      │ │ Service        │
+└────┬─────┘ └──────┬───────┘ └──────┬─────────┘
+     │              │                │
+     └──────────────┼────────────────┘
+                    v
+        ┌────────────────────────────┐
+        │ TupleSpace (SQLite)        │
+        │ - write / take / read      │
+        └────────────┬───────────────┘
+                     │
+                     v
+        ┌────────────────────────────┐
+        │ Worker de Processamento    │
+        │ consome COMPRA             │
+        └────────────────────────────┘
 ```
 
-## Comunicação Indireta
+---
 
-O cliente não conhece o Worker.
+## ⚙️ 4. Escolha da Arquitetura
 
-O cliente envia uma compra para o FastAPI.
+### ✔ FastAPI
 
-O FastAPI grava a compra no Tuple Space.
+Escolhi o **FastAPI** porque já estou mais familiarizado com o framework, o que facilitou o desenvolvimento, integração dos serviços e testes da API.
 
-O Worker consome a compra posteriormente.
+### ✔ Tuple Space (SQLite)
 
-Após processar, o Worker gera uma tupla de pedido.
+A escolha do **Tuple Space** foi feita porque:
 
-O cliente pode recuperar seus pedidos posteriormente.
+* exige menos complexidade de implementação em comparação com Pub/Sub, filas ou multicast
+* permite comunicação indireta simples
+* facilita persistência dos dados
 
-## Desacoplamento Demonstrado
+---
 
-### Desacoplamento Espacial
+## 🔄 5. Comunicação Indireta
 
-O cliente não possui qualquer referência ao Worker.
+O sistema utiliza **TupleSpace como intermediário**, garantindo:
 
-Toda comunicação ocorre através do Tuple Space.
+### ✔ Desacoplamento Espacial
 
-### Desacoplamento Temporal
+* Cliente não conhece o consumidor final
+* Comunicação ocorre via espaço compartilhado (SQLite)
 
-As compras permanecem armazenadas no SQLite.
+### ✔ Desacoplamento Temporal
 
-Mesmo que o Worker esteja desligado, as compras continuam disponíveis para processamento quando ele retornar.
+* Mensagens permanecem armazenadas no banco
+* O consumidor pode estar offline no momento da escrita
+* Os dados são processados posteriormente pelo worker
+
+---
+
+## 🧩 6. Conclusão
+
+A adoção do **Tuple Space com persistência em SQLite** permitiu a evolução do sistema para um modelo de comunicação indireta, reduzindo o acoplamento entre cliente e servidor.
+
+Apesar de simples, a abordagem atende aos requisitos do trabalho, garantindo:
+
+* desacoplamento espacial
+* desacoplamento temporal
+* comunicação assíncrona baseada em intermediário
+
+---
+
+Se quiser, posso agora:
+✔ melhorar isso para versão “nota 10 (mais acadêmica)”
+✔ ou adicionar seção de “testes de falha (servidor offline)”
+✔ ou ainda deixar pronto para PDF formatado da UFC
+
+---
 
 ## Tecnologias Utilizadas
 
@@ -157,3 +193,31 @@ python main.py
 ```bash
 python main.py
 ```
+
+## usar esse comando do commit pra saber quem e quando foi feita a alteração
+
+```bash
+git branch
+git status
+git add .
+git commit -m "Jose leonam $(Get-Date)"
+```
+
+```bash
+git push
+```
+
+ignora erro de commits do github
+
+```bash
+git push origin main --force
+```
+
+apaga codigo local e atualiza com o git
+
+```bash
+git fetch origin
+git reset --hard origin/<nome da branch>
+```
+
+---

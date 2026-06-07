@@ -140,7 +140,45 @@ O sistema utiliza **TupleSpace como intermediário**, garantindo:
 
 ---
 
-## 🧩 6. Conclusão
+## 📄 6. Relatório Técnico
+
+### ✔ Justificativa da Escolha
+
+A abordagem escolhida foi o Espaço de Tuplas (Tuple Space), pois ela se adapta melhor ao cenário do sistema de vendas por permitir comunicação indireta simples e desacoplada entre cliente e servidor.
+
+Essa escolha foi preferida em relação a alternativas como Pub-Sub, filas ou multicast porque:
+
+* reduz a complexidade de implementação
+* permite persistência natural dos dados via banco SQLite
+* facilita a integração com o sistema já existente baseado em serviços
+
+Além disso, o uso do Tuple Space se encaixa bem no modelo do projeto, pois os pedidos podem ser representados como tuplas e processados posteriormente por um worker assíncrono.
+
+### ✔ Análise (Overhead e Desempenho)
+
+A introdução de um intermediário (Tuple Space) traz benefícios de flexibilidade e desacoplamento, porém também gera algumas desvantagens:
+
+📉 Overhead introduzido:
+
+* consultas frequentes ao SQLite (I/O constante)
+* polling do worker (while True + sleep)
+* latência entre escrita e processamento
+* aumento da complexidade de gerenciamento de estado
+
+⚙️ Impacto no sistema:
+
+* leve atraso no processamento de pedidos
+* maior consumo de CPU pelo loop de verificação
+* dependência do banco como ponto central
+
+🛠️ Mitigação aplicada:
+
+* uso de SQLite local para reduzir latência de rede
+* estrutura simples de tuplas para reduzir parsing
+* sleep controlado no worker para evitar busy waiting
+* separação lógica entre serviços para reduzir carga no TupleSpace
+
+## 🧩 Conclusão
 
 A adoção do **Tuple Space com persistência em SQLite** permitiu a evolução do sistema para um modelo de comunicação indireta, reduzindo o acoplamento entre cliente e servidor.
 
@@ -168,7 +206,7 @@ Se quiser, posso agora:
 * Faker
 * Uvicorn
 
-## Execução
+## 🚀 Como Executar
 
 execute criente e servidor em diretorios separados
 
@@ -176,23 +214,25 @@ cliente -> Empresa_vendas/Cliente/
 
 servidor -> Empresa_vendas/Servidor/
 
-### 1. Instalar dependências
+### 1. Criar ambiente virtual SERVIDOR
 
 ```bash
+python -m venv SERVIDOR
+SERVIDOR\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Executar o FastAPI e Worker
+execute main.py e selecione as opções FastAPI e worker
+
+### 2. Criar ambiente virtual CLIENTE
 
 ```bash
-python main.py
+python -m venv CLIENTE
+CLIENTE\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### 4. Executar o Cliente
-
-```bash
-python main.py
-```
+execute a main.py
 
 ## usar esse comando do commit pra saber quem e quando foi feita a alteração
 

@@ -1,4 +1,4 @@
-# app/models/cliente.py
+# CLIENTE/app/models/cliente.py
 
 class Cliente:
 

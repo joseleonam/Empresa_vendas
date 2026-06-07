@@ -1,178 +1,113 @@
-// Cliente/app/network/java/main.java
-
+// Cliente/app/network/java/Main.java
 package app.network.java;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
-    public static void limparTela() {
+    static Scanner scanner = new Scanner(System.in);
 
-        try {
+    public static void main(String[] args) throws Exception {
 
-            if (System.getProperty("os.name")
-                    .toLowerCase()
-                    .contains("windows")) {
+        Cliente cliente = ClienteFactory.criarClienteFake();
 
-                new ProcessBuilder(
-                        "cmd",
-                        "/c",
-                        "cls"
-                ).inheritIO().start().waitFor();
+        while (true) {
 
-            } else {
+            System.out.println("\n=== SISTEMA DE VENDAS JAVA ===");
+            System.out.println("Cliente ID: " + cliente.id);
+            System.out.println("1 - Listar produtos");
+            System.out.println("2 - Buscar produtos");
+            System.out.println("3 - Comprar produtos");
+            System.out.println("4 - Calcular total");
+            System.out.println("5 - Buscar pedido");
+            System.out.println("0 - Sair");
 
-                new ProcessBuilder(
-                        "clear"
-                ).inheritIO().start().waitFor();
+            System.out.print("Escolha: ");
+            String op = scanner.nextLine();
+
+            switch (op) {
+
+                case "1" -> {
+                    limparTela();
+                    System.out.println("\n=== PRODUTOS ===");
+                    System.out.println(ClienteAPI.listarProdutos());
+                }
+
+                case "2" -> {
+                    System.out.print("IDs (ex: 1,2,3): ");
+                    List<Integer> ids2 = parseIds(scanner.nextLine());
+                    limparTela();
+                    System.out.println("\n=== RESULTADO ===");
+                    System.out.println(ClienteAPI.buscarProdutos(ids2));
+                }
+
+                case "3" -> {
+                    System.out.print("IDs (ex: 1,2,3): ");
+                    List<Integer> ids3 = parseIds(scanner.nextLine());
+                    limparTela();
+                    System.out.println("\n=== COMPRA ===");
+                    System.out.println(ClienteAPI.comprarProdutos(cliente, ids3));
+                }
+
+                case "4" -> {
+                    System.out.print("IDs (ex: 1,2,3): ");
+                    List<Integer> ids4 = parseIds(scanner.nextLine());
+                    limparTela();
+                    System.out.println("\n=== TOTAL ===");
+                    System.out.println(ClienteAPI.calcularTotal(ids4));
+                }
+
+                case "5" -> {
+                    limparTela();
+                    System.out.println("\n=== MEUS PEDIDOS ===");
+
+                    String pedidos = ClienteAPI.buscarPedido(cliente.id);
+
+                    if (pedidos.startsWith("\"") && pedidos.endsWith("\"")) {
+                        pedidos = pedidos.substring(1, pedidos.length() - 1);
+                    }
+
+                    pedidos = pedidos.replace("\\n", "\n");
+
+                    if (pedidos.contains("status")) {
+                        System.out.println(pedidos);
+                    } else {
+                        System.out.println(pedidos);
+                        System.out.println("-".repeat(40));
+                    }
+                }
+
+                case "0" -> {
+                    System.out.println("Saindo...");
+                    return;
+                }
+
+                default -> System.out.println("Opção inválida");
             }
-
-        } 
-        catch (
-                IOException
-                |InterruptedException
-                |NumberFormatException e
-        ) {
-        System.out.println(
-                "Erro: "
-                + e.getMessage()
-        );
         }
-        
     }
 
-        public static String menu(
-                Scanner scanner
-        ) {
+    private static List<Integer> parseIds(String input) {
+        String[] parts = input.split(",");
+        List<Integer> ids = new ArrayList<>();
 
-        System.out.println("\n=== SISTEMA DE VENDAS (API/JAVA) ===");
-
-        System.out.println("1 - Listar produtos");
-        System.out.println("2 - Buscar produtos");
-        System.out.println("3 - Comprar produtos");
-        System.out.println("4 - Calcular total");
-        System.out.println("0 - Sair");
-
-        System.out.print("Escolha: ");
-
-        return scanner.nextLine();
+        for (String p : parts) {
+            ids.add(Integer.valueOf(p.trim()));
         }
-
-    public static List<Integer> lerIds(
-            Scanner scanner
-    ) {
-
-        System.out.print(
-                "IDs (ex: 1,2,3): "
-        );
-
-        String entrada = scanner.nextLine();
-
-        String[] partes = entrada.split(",");
-
-        List<Integer> ids =
-                new ArrayList<>();
-
-        for (String p : partes) {
-
-            ids.add(Integer.valueOf(
-                            p.trim()
-                    )
-            );
-        }
-
         return ids;
     }
 
-    public static void main(
-            String[] args
-    ) {
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            String clienteJson =
-                    """
-                                    {
-                                      "id": 1,
-                                      "nome": "Oliver",
-                                      "email": "java@email.com"
-                                    }
-                                    """;
-            
-            OUTER:
-            while (true) {
-                String opcao = menu(scanner);
-                try {
-                    switch (opcao) {
-                        case "1" -> {
-                            limparTela();
-                            System.out.println(
-                                    "\n=== PRODUTOS ==="
-                            );  System.out.println(
-                                    ClienteApi
-                                            .listarProdutos()
-                            );
-                        }
-                        case "2" ->                         {
-                            List<Integer> ids =
-                                    lerIds(scanner);
-                            limparTela();
-                            System.out.println(
-                                    "\n=== RESULTADO ==="
-                            );      System.out.println(
-                                    ClienteApi
-                                            .buscarProdutos(
-                                                    ids
-                                            )
-                            );                             }
-                        case "3" ->                         {
-                            List<Integer> ids =
-                                    lerIds(scanner);
-                            limparTela();
-                            System.out.println(
-                                    "\n=== COMPRA ==="
-                            );      System.out.println(
-                                    ClienteApi
-                                            .comprarProdutos(
-                                                    clienteJson,
-                                                    ids
-                                            )
-                            );                             }
-                        case "4" ->                         {
-                            List<Integer> ids =
-                                    lerIds(scanner);
-                            limparTela();
-                            System.out.println(
-                                    "\n=== TOTAL ==="
-                            );      System.out.println(
-                                    ClienteApi
-                                            .calcularTotal(
-                                                    ids
-                                            )
-                            );                             }
-                        case "0" -> {
-                            System.out.println(
-                                    "Saindo..."
-                            );  break OUTER;
-                        }
-                        default -> System.out.println(
-                                    "Opção inválida"
-                            );
-                    }
-                }
-                catch (
-                        IOException
-                        |InterruptedException
-                        |NumberFormatException e
-                ) {
-                System.out.println(
-                        "Erro: "
-                        + e.getMessage()
-                );
-                }
+    private static void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
             }
+        } catch (IOException | InterruptedException e) {
+            System.out.println("\n".repeat(5));
         }
     }
 }

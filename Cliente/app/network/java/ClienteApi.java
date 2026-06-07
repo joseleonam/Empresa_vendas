@@ -1,155 +1,111 @@
-// Cliente/app/network/java/cliente.api.java
+// Cliente/app/network/java/ClienteApi.java
 package app.network.java;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ClienteApi {
+public class ClienteAPI {
 
     private static final String BASE_URL = "http://localhost:8000";
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static String formatarResposta(String response) {
 
-    private static final HttpClient client =
-            HttpClient.newHttpClient();
+        // Remove aspas externas do JSON stringificado
+        if (response.startsWith("\"") && response.endsWith("\"")) {
+            response = response.substring(1, response.length() - 1);
+        }
 
-    // 🔹 LISTAR PRODUTOS
-    public static String listarProdutos()
-            throws IOException, InterruptedException {
+        // Converte escapes \n em quebra real de linha
+        response = response.replace("\\n", "\n");
 
+        return response;
+    }
+
+    public static String listarProdutos() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/produtos"))
                 .GET()
                 .build();
 
-        HttpResponse<String> response =
-                client.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
+        String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
 
-        return response.body();
+         // 🔥 trata o texto retornado
+        return formatarResposta(response);
     }
 
-    // 🔹 BUSCAR PRODUTOS
-    public static String buscarProdutos(
-            List<Integer> ids
-    ) throws IOException, InterruptedException {
-
-        String idsStr = ids.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+    public static String buscarProdutos(List<Integer> ids) throws Exception {
+        String joined = String.join(",", ids.stream().map(String::valueOf).toList());
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(
-                        URI.create(
-                                BASE_URL +
-                                "/produtos/buscar?ids=" +
-                                idsStr
-                        )
-                )
+                .uri(URI.create(BASE_URL + "/produtos/buscar?ids=" + joined))
                 .GET()
                 .build();
 
-        HttpResponse<String> response =
-                client.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
+        String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
 
-        return response.body();
+         // 🔥 trata o texto retornado
+        return formatarResposta(response);
     }
 
-    // 🔹 COMPRAR PRODUTOS
-    public static String comprarProdutos(
-            String clienteJson,
-            List<Integer> ids
-    ) throws IOException, InterruptedException {
+    public static String comprarProdutos(Cliente cliente, List<Integer> ids) throws Exception {
 
-        String idsJson = ids.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+        StringBuilder idsJson = new StringBuilder("[");
+        for (int i = 0; i < ids.size(); i++) {
+            idsJson.append(ids.get(i));
+            if (i < ids.size() - 1) idsJson.append(",");
+        }
+        idsJson.append("]");
 
-        String payload =
-                "{"
-                + "\"cliente\":"
-                + clienteJson
-                + ","
-                + "\"ids\":["
-                + idsJson
-                + "]"
-                + "}";
+        String json = String.format(
+            "{\"cliente\":%s,\"ids\":%s}",
+            cliente.toJson(),
+            idsJson
+        );
 
-        HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(
-                                URI.create(
-                                        BASE_URL +
-                                        "/compras"
-                                )
-                        )
-                        .header(
-                                "Content-Type",
-                                "application/json"
-                        )
-                        .POST(
-                                HttpRequest.BodyPublishers
-                                        .ofString(payload)
-                        )
-                        .build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/compras"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
 
-        HttpResponse<String> response =
-                client.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
+        String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
 
-        return response.body();
+         // 🔥 trata o texto retornado
+        return formatarResposta(response);
     }
 
-    // 🔹 CALCULAR TOTAL
-    public static String calcularTotal(
-            List<Integer> ids
-    ) throws IOException, InterruptedException {
+    public static String calcularTotal(List<Integer> ids) throws Exception {
 
-        String idsJson = ids.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+        StringBuilder json = new StringBuilder("{\"ids\":[");
+        for (int i = 0; i < ids.size(); i++) {
+            json.append(ids.get(i));
+            if (i < ids.size() - 1) json.append(",");
+        }
+        json.append("]}");
 
-        String payload =
-                "{"
-                + "\"ids\":["
-                + idsJson
-                + "]"
-                + "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/total"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
 
-        HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(
-                                URI.create(
-                                        BASE_URL +
-                                        "/total"
-                                )
-                        )
-                        .header(
-                                "Content-Type",
-                                "application/json"
-                        )
-                        .POST(
-                                HttpRequest.BodyPublishers
-                                        .ofString(payload)
-                        )
-                        .build();
+        String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
 
-        HttpResponse<String> response =
-                client.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                );
+         // 🔥 trata o texto retornado
+        return formatarResposta(response);
+    }
 
-        return response.body();
+    public static String buscarPedido(int clienteId) throws Exception {
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/pedidos/" + clienteId))
+                .GET()
+                .build();
+
+        String response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+
+         // 🔥 trata o texto retornado
+        return formatarResposta(response);
     }
 }

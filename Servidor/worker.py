@@ -1,3 +1,5 @@
+# Servidor/worker.py
+
 from app.tuplespace.global_space import space
 from data.load_produtos import carregar_produtos
 
